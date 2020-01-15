@@ -4,6 +4,7 @@ import {StyleSheet, FlatList, Text, View, Alert, TouchableOpacity, TextInput, Bu
 
 import TimePicker from './TimePicker';
 import CountDown from './CountDown';
+import {forStatement} from '@babel/types';
 
 let id = 0
 
@@ -39,13 +40,12 @@ const CountDownTimer = props => (
     </View>
 )
 
-
-
 export default class App extends Component {
 
-    constructor() {
-        super()
+    constructor(props) {
+        super(props)
         this.state = {
+            timer: null,
             timers: [],
             timerArray:[],
             selectedHours: 0,
@@ -53,6 +53,7 @@ export default class App extends Component {
             selectedSeconds: 0
         }
     }
+
 
 
     addTimer() {
@@ -85,6 +86,14 @@ export default class App extends Component {
         })
     }
 
+    masterTimer() {
+        let timer = setInterval(() => {
+            this.startTimers()
+        }, 1000)
+
+        this.setState({timer})
+    }
+
     startTimers() {
         console.log("Starting Timer")
         //if timerArray length > 0
@@ -101,36 +110,46 @@ export default class App extends Component {
             //if time != 0
             if (localTimerArray[activeTimerIndex].currentTime != 0) {
                 console.log("Time left, do it again")
-                //update state
+
                 this.setState(
-                    { timerArray: localTimerArray},
-                    //do it again
-                    () => setInterval(this.startTimers(), 10000)
+                    { timerArray: localTimerArray}
                 )
             } else {
                 localTimerArray[activeTimerIndex].completed = true
-                this.setState(
-                    { timerArray: localTimerArray},
-                    //do it again
-                    () => setInterval(this.startTimers(), 10000)
-                )
+                this.setState({ timerArray: localTimerArray})
             }
 
         } else {
+            console.log("We are out of timers to iterate")
             //mark timer as compete timer
-            Alert("Times UP!")
-            console.log("we are out of timers to itrate")
+            clearInterval(this.state.timer)
+            this.setState({timer: null})
+            alert("Times UP!")
             //trigger alert
-          //countdown of next timer
+              //countdown of next timer
         }
 
         //else
             //The session is done
     }
 
-    //resetSession() {
+    resetSession() {
         //reset status of countdowns.
-    //}
+        let localTimerArray = this.state.timerArray
+        this.setState({
+            timerArray: this.state.timerArray.map(timer => {
+                if (timer.completed == true) {
+                    return {
+                        id: timer.id,
+                        text: timer.text,
+                        currentTime: timer.originalTime,
+                        completed: !timer.completed
+                    }
+                }
+            })
+        })
+
+    }
 
     removeTimer(id) {
 
@@ -169,7 +188,8 @@ export default class App extends Component {
         return (
             <View style={styles.container}>
                 <Button title='ADD Timer' onPress={() => this.addTimer()}></Button>
-                <Button title='Start Countdown' onPress={() => this.startTimers()}></Button>
+                <Button title='Start Countdown' onPress={() => this.masterTimer()}></Button>
+                <Button title='Reset Countdown' onPress={() => this.resetSession()}></Button>
                 <View>
                     {this.state.timers.map(timer => (
                         <Timer
