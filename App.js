@@ -17,7 +17,7 @@ export default class App extends Component {
     };
 
 
-    clockDex = 1;
+    clockDex = 0;
     constructor(props) {
 
         super(props);
@@ -42,7 +42,7 @@ export default class App extends Component {
 
     createTimer() {
 
-        this.clockDex += this.clockDex;
+        this.clockDex = this.clockDex + 1;
 
         let time = (this.state.selectedHours * 60 * 60) + (this.state.selectedMinutes * 60) + (this.state.selectedSeconds);
         console.log(time);

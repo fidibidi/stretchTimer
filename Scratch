@@ -1,0 +1,11 @@
+// The timers, refer to a collection of data about each timer
+
+
+state = [{Timer1 : {}}, {Timer2 : {until:100, alert:True, title:"X"}}
+        ]
+
+//
+// well think of it this way.
+//
+//     we add timers to an array, each timer has relevant info pertaining to its timer
+these timers are rendered using a component that displays taht data.
